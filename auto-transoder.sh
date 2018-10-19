@@ -4,6 +4,7 @@
 # set -x;
 
 URL="";
+FILENAME="";
 
 getURL() {
 	echo "Please insert the video's URL: ";
@@ -17,7 +18,20 @@ getURL() {
 	fi;
 }
 
-while [ true ]; do
+getFileName() {
+	while [ true ]; do
+		echo "Please insert the media's filename: ";
+		read -r FILENAME;
+
+		if [[ -f "$FILENAME" ]]; then
+			echo "A file already exists, with that name.";
+		else
+			break;
+		fi;
+	done
+}
+
+while [ "$OPTION" != "q" ]; do
 
 	echo "                ###########							 ";
 	echo "What do you want to do?";
@@ -38,17 +52,20 @@ while [ true ]; do
 		getURL;
 		echo "Please insert the media's format id: ";
 		read -r FORMAT;
-		youtube-dl "$URL" -f "$FORMAT";
+
+		getFileName;
+		youtube-dl "$URL" -f "$FORMAT" -o "$FILENAME";
 	elif [[ "$OPTION" == "3" ]]; then
 		getURL;
 		ID=`youtube-dl "$URL" --get-id`;
-		TITLE=`youtube-dl "$URL" --get-title`;
-		FILE="./$ID.webm";
-		TARGET="$TITLE-$ID.ogg";
+		TEMP="./$ID.webm";
+
+		getFileName;
+		TARGET="$FILENAME";
 
 		youtube-dl "$URL" -f 171 --id -q;
-		ffmpeg -i "$FILE" -vn -b:a 128k -vol 270 -codec libvorbis "$TARGET";
-		rm "$FILE";
+		ffmpeg -loglevel panic -i "$TEMP" -vn -b:a 128k -vol 270 -codec libvorbis "$TARGET";
+		rm "$TEMP";
 
 		echo "      ############		 ";
 		echo "Audio ready @:\"./$TARGET\"";
