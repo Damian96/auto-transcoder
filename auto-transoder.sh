@@ -30,7 +30,7 @@ while [ true ]; do
 
 	if [[ "$OPTION" == "q" ]]; then
 		echo "Bye!";
-		exit;
+		exit 0;
 	elif [[ "$OPTION" == "1" ]]; then
 		getURL;
 		youtube-dl "$URL" -F;
