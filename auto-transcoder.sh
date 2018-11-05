@@ -24,7 +24,7 @@ getFileName() {
 		read -r FILENAME;
 
 		if [[ -f "$FILENAME" ]]; then
-			echo "A file already exists, with that name.";
+			echo "A file already exists, with that name. Please insert a different one.";
 		else
 			break;
 		fi;
@@ -37,7 +37,7 @@ while [ "$OPTION" != "q" ]; do
 	echo "What do you want to do?";
 	echo "1. View available formats of media.";
 	echo "2. Download media.";
-	echo "3. Download & Transcode media to highest quality audio.";
+	echo "3. Download & Transcode media to highest quality audio (.ogg).";
 	echo "['q': exit]";
 	echo ": ";
 	read -r OPTION;
