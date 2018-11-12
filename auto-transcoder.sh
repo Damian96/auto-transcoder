@@ -20,7 +20,7 @@ getURL() {
 
 getFileName() {
 	while [ true ]; do
-		printf "\n%s" "Please insert the media's filename: ";
+		printf "\n%s" "Please insert the media's filename (without extension): ";
 		read -r FILENAME;
 
 		if [[ -f "$FILENAME" ]]; then
@@ -54,7 +54,7 @@ while [ "$OPTION" != "q" ]; do
 		read -r FORMAT;
 
 		getFileName;
-		youtube-dl "$URL" -f "$FORMAT" -o "$FILENAME";
+		youtube-dl "$URL" -f "$FORMAT" -o "$FILENAME.ogg";
 	elif [[ "$OPTION" == "3" ]]; then
 		getURL;
 		ID=`youtube-dl "$URL" --get-id`;
@@ -63,7 +63,7 @@ while [ "$OPTION" != "q" ]; do
 			TEMP="./$ID.webm";
 
 			getFileName;
-			TARGET="$FILENAME";
+			TARGET="$FILENAME.ogg";
 
 			youtube-dl "$URL" -f 171 --id -q;
 
@@ -82,3 +82,16 @@ while [ "$OPTION" != "q" ]; do
 		fi
 	fi
 done
+
+unset URL;
+unset FILENAME;
+unset TARGET;
+unset ID;
+unset TEMP;
+unset FORMAT;
+unset OPTION;
+
+unset getFileName;
+unset getUrl;
+
+exit 0;
