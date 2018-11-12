@@ -23,7 +23,7 @@ getFileName() {
 		printf "\n%s" "Please insert the media's filename (without extension): ";
 		read -r FILENAME;
 
-		if [[ -f "$FILENAME" ]]; then
+		if [[ -f "$FILENAME.ogg" ]]; then
 			printf "\n%s" "A file already exists, with that name. Please insert a different one.";
 		else
 			break;
@@ -33,7 +33,7 @@ getFileName() {
 
 while [ "$OPTION" != "q" ]; do
 
-	printf "\n%s" "                ###########							 ";
+	printf "\n%s" "                ###########";
 	printf "\n%s" "What do you want to do?";
 	printf "\n%s" "1. View available formats of media.";
 	printf "\n%s" "2. Download media.";
