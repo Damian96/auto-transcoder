@@ -6,6 +6,31 @@
 URL="";
 FILENAME="";
 
+transcodeVideo() {
+	ID=`youtube-dl "$URL" --get-id`;
+
+	if [[ $? == 0 ]]; then
+		TEMP="./$ID.webm";
+
+		TARGET="$FILENAME.ogg";
+
+		youtube-dl "$URL" -f 171 --id -q;
+
+		if [[ $? == 0 ]]; then
+			ffmpeg -loglevel panic -i "$TEMP" -vn -b:a 128k -vol 270 -codec libvorbis "$TARGET";
+			printf "\n%s" "      ############		 ";
+			printf "\n%s" "Audio ready @:\"./$TARGET\"";
+			printf "\n%s" "      ############		 ";
+		else
+			printf "\n%s" "Something went wrong while downloding the video.";
+		fi
+
+		rm "$TEMP";
+	else
+		printf "\n%s" "The video you entered does not exist.";
+	fi
+}
+
 getURL() {
 	printf "\n%s" "Please insert the video's URL: ";
 	read -r URL;
@@ -30,6 +55,17 @@ getFileName() {
 		fi;
 	done
 }
+
+totalargs=$#
+if [[ totalargs -ge 1 ]]; then
+	for ((i=1 ; i <= totalargs ; i++))
+	do
+		URL=$1
+		getFileName
+		transcodeVideo
+	done
+	exit;
+fi;
 
 while [ "$OPTION" != "q" ]; do
 
@@ -57,29 +93,8 @@ while [ "$OPTION" != "q" ]; do
 		youtube-dl "$URL" -f "$FORMAT" -o "$FILENAME.ogg";
 	elif [[ "$OPTION" == "3" ]]; then
 		getURL;
-		ID=`youtube-dl "$URL" --get-id`;
-
-		if [[ $? == 0 ]]; then
-			TEMP="./$ID.webm";
-
-			getFileName;
-			TARGET="$FILENAME.ogg";
-
-			youtube-dl "$URL" -f 171 --id -q;
-
-			if [[ $? == 0 ]]; then
-				ffmpeg -loglevel panic -i "$TEMP" -vn -b:a 128k -vol 270 -codec libvorbis "$TARGET";
-				printf "\n%s" "      ############		 ";
-				printf "\n%s" "Audio ready @:\"./$TARGET\"";
-				printf "\n%s" "      ############		 ";
-			else
-				printf "\n%s" "Something went wrong while downloding the video.";
-			fi
-
-			rm "$TEMP";
-		else
-			printf "\n%s" "The video you entered does not exist.";
-		fi
+		getFileName
+		transcodeVideo
 	fi
 done
 
