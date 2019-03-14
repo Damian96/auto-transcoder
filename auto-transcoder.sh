@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Set Debugging
 # set -x;
@@ -58,8 +58,7 @@ getFileName() {
 
 totalargs=$#
 if [[ totalargs -ge 1 ]]; then
-	local i;
-	for ((i=1 ; i <= totalargs ; i++))
+	for (( i=1; i <= totalargs; i++ ))
 	do
 		URL=$1
 		getFileName
