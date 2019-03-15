@@ -18,9 +18,9 @@ transcodeVideo() {
 
 		if [[ $? == 0 ]]; then
 			ffmpeg -loglevel panic -i "$TEMP" -vn -b:a 128k -vol 270 -codec libvorbis "$TARGET";
-			printf "\n%s" "      ############		 ";
-			printf "\n%s" "Audio ready @:\"./$TARGET\"";
-			printf "\n%s" "      ############		 ";
+			printf "\n%s\n" "      ############		 ";
+			printf "\n%s\n" "Audio ready @:\"./$TARGET\"";
+			printf "\n%s\n" "      ############		 ";
 		else
 			printf "\n%s" "Something went wrong while downloding the video.";
 		fi
@@ -58,8 +58,7 @@ getFileName() {
 
 totalargs=$#
 if [[ totalargs -ge 1 ]]; then
-	local i;
-	for ((i=1 ; i <= totalargs ; i++))
+	for (( i=1; i <= totalargs; i++ ))
 	do
 		URL=$1
 		getFileName
