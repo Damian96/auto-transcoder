@@ -99,7 +99,6 @@ unset URL;
 unset FILENAME;
 unset TARGET;
 unset ID;
-unset TEMP;
 unset FORMAT;
 unset OPTION;
 
