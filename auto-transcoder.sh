@@ -7,17 +7,14 @@ URL="";
 FILENAME="";
 
 transcodeVideo() {
-	ID=`youtube-dl "$URL" --get-id`;
 
 	if [[ $? == 0 ]]; then
-		TEMP="./$ID.webm";
-
 		TARGET="$FILENAME.ogg";
 
-		youtube-dl "$URL" -f 171 --id -q;
+		youtube-dl "$URL" -f bestaudio/best -q -o "audiostream";
 
 		if [[ $? == 0 ]]; then
-			ffmpeg -loglevel panic -i "$TEMP" -vn -b:a 128k -vol 270 -codec libvorbis "$TARGET";
+			ffmpeg -loglevel panic -i "audiostream" -vn -b:a 128k -vol 270 -codec libvorbis "$TARGET";
 			printf "\n%s\n" "      ############		 ";
 			printf "\n%s\n" "Audio ready @:\"./$TARGET\"";
 			printf "\n%s\n" "      ############		 ";
@@ -25,7 +22,7 @@ transcodeVideo() {
 			printf "\n%s" "Something went wrong while downloding the video.";
 		fi
 
-		rm "$TEMP";
+		rm "audiostream";
 	else
 		printf "\n%s" "The video you entered does not exist.";
 	fi
@@ -101,11 +98,8 @@ done
 unset URL;
 unset FILENAME;
 unset TARGET;
-unset ID;
-unset TEMP;
 unset FORMAT;
 unset OPTION;
-
 unset getFileName;
 unset getUrl;
 
