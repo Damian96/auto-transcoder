@@ -98,10 +98,8 @@ done
 unset URL;
 unset FILENAME;
 unset TARGET;
-unset ID;
 unset FORMAT;
 unset OPTION;
-
 unset getFileName;
 unset getUrl;
 
