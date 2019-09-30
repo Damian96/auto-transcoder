@@ -7,22 +7,16 @@ URL="";
 FILENAME="";
 
 transcodeVideo() {
-
 	if [[ $? == 0 ]]; then
 		TARGET="$FILENAME.ogg";
 
-		youtube-dl "$URL" -f bestaudio/best -q -o "audiostream";
+    youtube-dl "$URL" -f bestaudio/best --output-template "%(channel)s-%(title)s-%(ext)s" --console-title --no-call-home --extract-audio --audio-format vorbis --audio-quality 0 --metadata-from-title "%(artist)s - %(title)s" --fixup warn --prefer-ffmpeg
 
 		if [[ $? == 0 ]]; then
-			ffmpeg -loglevel panic -i "audiostream" -vn -b:a 128k -vol 270 -codec libvorbis "$TARGET";
-			printf "\n%s\n" "      ############		 ";
-			printf "\n%s\n" "Audio ready @:\"./$TARGET\"";
-			printf "\n%s\n" "      ############		 ";
+			printf "%s\n" "###SUCCESS###"
 		else
-			printf "\n%s" "Something went wrong while downloding the video.";
+			printf "\n%s" "Something went wrong while downloading the video.";
 		fi
-
-		rm "audiostream";
 	else
 		printf "\n%s" "The video you entered does not exist.";
 	fi
