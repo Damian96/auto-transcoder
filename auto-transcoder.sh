@@ -1,100 +1,103 @@
 #!/bin/bash
 
 # Set Debugging
-# set -x;
+# set -x
 
-URL="";
-FILENAME="";
+URL=""
+FILENAME=""
+
+_trapCmd() {
+  trap 'kill -TERM $PID; exit 130;' TERM
+  eval "$1" &
+  PID=$!
+  wait $PID
+}
+
+_check() {
+	if [[ ! -w "." ]]; then
+		printf "%s\n" "Current folder is not writable."
+		exit 2
+	fi
+}
 
 transcodeVideo() {
 	if [[ $? == 0 ]]; then
-		TARGET="$FILENAME.ogg";
+		TARGET="$FILENAME.ogg"
 
-    youtube-dl "$URL" -f bestaudio/best --output-template "%(channel)s-%(title)s-%(ext)s" --console-title --no-call-home --extract-audio --audio-format vorbis --audio-quality 0 --metadata-from-title "%(artist)s - %(title)s" --fixup warn --prefer-ffmpeg
+		_trapCmd "youtube-dl \"$URL\" -f bestaudio/best --output-template \"%(title)s\" --console-title --no-call-home --extract-audio --audio-format vorbis --audio-quality 0 --fixup warn --prefer-ffmpeg --abort-on-error"
 
 		if [[ $? == 0 ]]; then
-			printf "%s\n" "###SUCCESS###"
+			printf "%s\n" "success"
 		else
-			printf "\n%s" "Something went wrong while downloading the video.";
+			printf "\n%s" "Something went wrong while downloading the video"
+			exit 2
 		fi
 	else
-		printf "\n%s" "The video you entered does not exist.";
+		printf "\n%s" "The video you entered does not exist"
+		exit 1
 	fi
 }
 
 getURL() {
-	printf "\n%s" "Please insert the video's URL: ";
-	read -r URL;
+	while [[ true ]]; do
+		read "\n%sInsert the video's URL: " -r URL
 
-	if [[ -z $URL ]]; then
-		printf "\n%s" "Error: Empty URL provided";
-		exit 1;
-	else
-		printf "\n%s" "$URL";
-	fi;
+		if [[ -z $URL ]]; then
+			printf "%s\n" "Invalid URL"
+		else
+			break
+		fi
+	done
 }
 
 getFileName() {
-	while [ true ]; do
-		printf "\n%s" "Please insert the media's filename (without extension): ";
-		read -r FILENAME;
-
-		if [[ -f "$FILENAME.ogg" ]]; then
-			printf "\n%s" "A file already exists, with that name. Please insert a different one.";
-		else
-			break;
-		fi;
-	done
+	read -p "Insert output filename: " -r FILENAME
 }
 
 totalargs=$#
 if [[ totalargs -ge 1 ]]; then
-	for (( i=1; i <= totalargs; i++ ))
-	do
+	for (( i=1; i <= totalargs; i++ )) do
+	printf "%s\n" "Downloading $i out of $# videos..."
 		URL=$1
 		getFileName
 		transcodeVideo
 	done
-	exit;
-fi;
+	exit
+fi
 
 while [ "$OPTION" != "q" ]; do
-
-	printf "\n%s" "                ###########";
-	printf "\n%s" "What do you want to do?";
-	printf "\n%s" "1. View available formats of media.";
-	printf "\n%s" "2. Download media.";
-	printf "\n%s" "3. Download & Transcode media to highest quality audio (.ogg).";
-	printf "\n%s" "['q': exit]";
-	printf "\n%s" ": ";
-	read -r OPTION;
+	getURL
+	printf "\n%s" "1. View available formats"
+	printf "\n%s" "2. Download"
+	printf "\n%s" "3. Download & Transcode to highest quality audio (ogg/libvorbis)"
+	printf "\n%s" "[Q]uit/[q]uit:"
+	read -p "\n%s: " -r OPTION
 
 	if [[ "$OPTION" == "q" ]]; then
-		printf "\n%s" "Bye!";
-		exit 0;
-	elif [[ "$OPTION" == "1" ]]; then
-		getURL;
-		youtube-dl "$URL" -F;
+		printf "\n%s\n" "Bye!"
+		exit 0
+	elif [[ "$OPTION" == "1" ]]; then	
+		youtube-dl "$URL" --list-formats --abort-on-error
 	elif [[ "$OPTION" == "2" ]]; then
-		getURL;
-		printf "\n%s" "Please insert the media's format id: ";
-		read -r FORMAT;
+		printf "\n%s" "Available video formats:"
+		youtube-dl "$URL" --list-formats --abort-on-error
+		read -p "\n%sInsert the media format: " -r FORMAT
 
-		getFileName;
-		youtube-dl "$URL" -f "$FORMAT" -o "$FILENAME.ogg";
+		getFileName
+		youtube-dl "$URL" -f "$FORMAT" -o "$FILENAME.ogg" --abort-on-error
 	elif [[ "$OPTION" == "3" ]]; then
-		getURL;
 		getFileName
 		transcodeVideo
 	fi
 done
 
-unset URL;
-unset FILENAME;
-unset TARGET;
-unset FORMAT;
-unset OPTION;
-unset getFileName;
-unset getUrl;
+unset URL
+unset FILENAME
+unset TERM
+unset TARGET
+unset FORMAT
+unset OPTION
+unset getFileName
+unset getURL
 
-exit 0;
+exit 0
